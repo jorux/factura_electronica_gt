@@ -311,7 +311,7 @@ def generate_credit_note(invoice_code, naming_series, reference_inv, reason):
         return False, str(frappe.get_traceback())
 ##Empieza la funcion para las notas de abono
     @frappe.whitelist()
-    def generate_nota_abono(invoice_code, naming_series, reference_inv, reason):
+def generate_nota_abono(invoice_code, naming_series, reference_inv, reason):
     """
     Funcion intermediaria para generar nota de abono electronica
 
