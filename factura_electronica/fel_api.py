@@ -313,7 +313,7 @@ def generate_credit_note(invoice_code, naming_series, reference_inv, reason):
 
 
 @frappe.whitelist()
-def generate_nota_abono(invoice_code, naming_series, reference_inv, reason):
+def generate_nota_abono(invoice_code, naming_series, reason):
     """
     Funcion intermediaria para generar nota de abono electronica
 
