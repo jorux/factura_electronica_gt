@@ -1066,8 +1066,7 @@ def is_valid_to_fel(doctype, docname):
         else:
             return _('Serie de documento para nota de credito electrónica no configurada, \
                 por favor agregarla y activarla en configuración Factura Electrónica para generar documento FEL'), False, False
-    #Condiciones para FEL Sales Invoice -> Nota abono
-    # Condiciones para FEL Sales Invoice -> Nota Credito
+    #Condiciones para FEL Sales Invoice -> Nota abono -- Eliminar esto y dejar nota de credito con un extra para el return.against.
     elif (docinv.doctype == 'Sales Invoice') and (docinv.docstatus == 1) and (docinv.is_return == 1):
 
         # Validacion de serie - Depende de Credit Note
