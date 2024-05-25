@@ -458,7 +458,6 @@ function btn_nota_abono(frm) {
                 args: {
                   invoice_code: frm.doc.name,
                   naming_series: frm.doc.naming_series,
-                  reference_inv: frm.doc.return_against,
                   reason: values.reason_adjust,
                 },
                 callback: function (data) {
