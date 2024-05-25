@@ -155,7 +155,7 @@ function btn_generator(frm) {
           pdf_credit_note(frm);
         }
       }
-      // SI APLICA EL ESCENARIO MUESTRA EL BOTON PARA Generación Nota Credito Electronica
+      // SI APLICA EL ESCENARIO MUESTRA EL BOTON PARA Generación Nota abono Electronica
       if (r.message[0] === "NABN" && r.message[1] === "valido" && r.message[2]) {
         btn_nota_abono(frm);
         if (frm.doc.numero_autorizacion_fel) {
@@ -455,7 +455,7 @@ function btn_nota_abono(frm) {
               let mi_url = window.location.href;
 
               frappe.call({
-                method: "factura_electronica.fel_api.generate_credit_note",
+                method: "factura_electronica.fel_api.generate_nota_abono",
                 args: {
                   invoice_code: frm.doc.name,
                   naming_series: frm.doc.naming_series,
