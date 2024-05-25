@@ -357,7 +357,7 @@ def generate_nota_abono(invoice_code, naming_series, reason):
         # PASO 3: NOTA DE ABONO ELECTRONICA
         # paso 3.1 - NUEVA INSTANCIA
         # new_credit_note = ElectronicCreditNote(invoice_code, status_config[1], naming_series, reason)
-        new_credit_note = ElectronicCreditNote(actual_inv_name, status_config[1], naming_series, reason)
+        new_credit_note = ElectronicCreditNote(actual_inv_name, status_config[1], naming_series)
 
         # PASO 3.2 - VALIDA LOS DATOS NECESARIOS PARA CONSTRUIR EL XML
         status = new_credit_note.build_credit_note()
