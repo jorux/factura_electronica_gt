@@ -1066,6 +1066,21 @@ def is_valid_to_fel(doctype, docname):
         else:
             return _('Serie de documento para nota de credito electrónica no configurada, \
                 por favor agregarla y activarla en configuración Factura Electrónica para generar documento FEL'), False, False
+    #Condiciones para FEL Sales Invoice -> Nota abono
+    # Condiciones para FEL Sales Invoice -> Nota Credito
+    elif (docinv.doctype == 'Sales Invoice') and (docinv.docstatus == 1) and (docinv.is_return == 1):
+
+        # Validacion de serie - Depende de Credit Note
+        active = frappe.db.exists('Configuracion Factura Electronica', {'name': config_name, 'nota_credito_fel': 1})
+
+        if val_serie and active:
+            values = frappe.db.get_values('Configuracion Series FEL',
+                                          filters={'parent': config_name, 'serie': docinv.naming_series},
+                                          fieldname=['tipo_documento'], as_dict=1)
+            return values[0]['tipo_documento'], 'valido', True
+        else:
+            return _('Serie de documento para nota de abono electrónica no configurada, \
+                por favor agregarla y activarla en configuración Factura Electrónica para generar documento FEL'), False, False
 
     # Condiciones para FEL Sales Invoice -> Cancelador de FEl Normal, Exportacion, Nota de credito
     elif (docinv.doctype in ['Sales Invoice', 'Purchase Invoice']) and (docinv.docstatus == 2) and (docinv.numero_autorizacion_fel):
