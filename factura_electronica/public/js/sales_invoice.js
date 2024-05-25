@@ -426,7 +426,7 @@ function btn_credit_note(frm) {
     .addClass("btn-primary");
 }
 /**
- * @summary Render para boton notas de credito electronicas
+ * @summary Render para boton notas de abono electronicas
  *
  * @param {*} frm
  */
@@ -434,26 +434,6 @@ function btn_nota_abono(frm) {
   cur_frm.clear_custom_buttons();
   frm
     .add_custom_button(__("GENERAR NOTA DE ABONO"), function () {
-      // Permite hacer confirmaciones
-      frappe.confirm(
-        __("Proceder con la generacion del la nota de abono?"),
-        () => {
-          let d = new frappe.ui.Dialog({
-            title: __("Generar nota de abono"),
-            fields: [
-              {
-                label: __("Inserte la razon del ajuste"),
-                fieldname: "reason_adjust",
-                fieldtype: "Data",
-                reqd: 1,
-              },
-            ],
-            primary_action_label: __("Submit"),
-            primary_action(values) {
-              let serie_de_factura = frm.doc.name;
-              // Guarda la url actual
-              let mi_url = window.location.href;
-
               frappe.call({
                 method: "factura_electronica.fel_api.generate_nota_abono",
                 args: {
