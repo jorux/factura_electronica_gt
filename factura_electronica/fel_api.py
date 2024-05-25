@@ -1072,6 +1072,10 @@ def is_valid_to_fel(doctype, docname):
     #Condiciones para FEL Sales Invoice -> Nota abono -- Eliminar esto y dejar nota de credito con un extra para el return.against.
     elif (docinv.doctype == 'Sales Invoice') and (docinv.docstatus == 1) and (docinv.is_return == 1):
 
+# Validacion de serie
+        active = frappe.db.exists('Configuracion Factura Electronica', {'name': config_name, 'nota_credito_fel': 1})
+        # Validacion de serie
+        active = frappe.db.exists('Configuracion Factura Electronica', {'name': config_name, 'nota_credito_fel': 1})
         if val_serie and active:
             values = frappe.db.get_values('Configuracion Series FEL',
                                           filters={'parent': config_name, 'serie': docinv.naming_series},
