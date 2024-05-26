@@ -61,7 +61,6 @@ class ElectronicAbonoNote:
                                     "dte:DatosGenerales": self.__d_general,
                                     "dte:Emisor": self.__d_emisor,
                                     "dte:Receptor": self.__d_receptor,
-                                    "dte:Frases": self.__d_frases,
                                     "dte:Items": self.__d_items,
                                     "dte:Totales": self.__d_totales
                                 }
