@@ -17,7 +17,7 @@ from factura_electronica.utils.utilities_facelec import get_currency_precision, 
 
 # EN RESUMEN, ES DEVOLUCION DESDE SALES INVOICE sin iva
 class ElectronicAbonoNote:
-    def __init__(self, actual_inv_name, conf_name, naming_series):
+    def __init__(self, actual_inv_name,  conf_name, naming_series):
         """__init__
         Constructor de la clase, las propiedades iniciadas como privadas
 
@@ -27,6 +27,7 @@ class ElectronicAbonoNote:
         """
         self.__config_name = conf_name
         self.__naming_serie = naming_series
+        self.__reason = reason
         self.__inv_credit_note = actual_inv_name  # HACE REFERENCIA A LA NUEVA NOTA DE CREDITO
         self.__log_error = []
         self.__precision = get_currency_precision()
@@ -62,8 +63,9 @@ class ElectronicAbonoNote:
                                     "dte:DatosGenerales": self.__d_general,
                                     "dte:Emisor": self.__d_emisor,
                                     "dte:Receptor": self.__d_receptor,
+                                    "dte:Frases": self.__d_frases,
                                     "dte:Items": self.__d_items,
-                                    "dte:Totales": self.__d_totales,
+                                    "dte:Totales": self.__d_totales
                                 }
                             }
                         }
@@ -109,15 +111,20 @@ class ElectronicAbonoNote:
         if status_receiver[0] == False:
             return status_receiver
         
+        # Validacion y generacion seccion frases
+        status_phrases = self.phrases()
+        if status_phrases[0] == False:
+            return status_phrases
+        
         # Validacion y generacion seccion items
         status_items = self.items()
         if status_items == False:
             return status_items
-            
-        # Validacion y generacion seccion complementos
-        status_complements = self.complements()
-        if status_complements == False:
-            return status_complements
+
+        # Validacion y generacion seccion totales
+        status_totals = self.totals()
+        if status_totals == False:
+            return status_totals
 
         # Validacion y generacion seccion adendas
         status_adendas = self.adendas()
@@ -359,7 +366,52 @@ class ElectronicAbonoNote:
 
         except:
             return False, 'Error no se puede completar la operacion por: '+str(frappe.get_traceback())
-    #este no lleva frases
+    def phrases(self):
+        """
+        debe indicarse los regímenes y textos especiales que son requeridos en los DTE,
+        de acuerdo a la afiliación del contribuyente y tipo de operación.
+        Returns:
+            boolean: True/False
+        """
+
+        try:
+            # Obtiene el nombre de la combinacion configurada para la serie
+            combination_name = frappe.db.get_value('Configuracion Series FEL',
+                                                   {'parent': self.__config_name,
+                                                    'serie': self.__naming_serie}, 'combination_of_phrases')
+
+            # Obtiene las combinaciones de frases a usar en la factura
+            phrases_to_doc = frappe.db.get_values('FEL Combinations', filters={'parent': combination_name},
+                                                  fieldname=['tipo_frase', 'codigo_de_escenario'], as_dict=1)
+
+            if not phrases_to_doc:
+                return False, 'Ocurrio un problema, no se encontro ninguna combinación de frases para generar la factura \
+                              por favor cree una y configurela en Configuración Factura Electrónica'
+
+            # Si hay mas de una frase
+            if len(phrases_to_doc) > 1:
+                self.__d_frases = {
+                    "dte:Frase": []
+                }
+
+                for f in phrases_to_doc:
+                    self.__d_frases["dte:Frase"].append({
+                        "@CodigoEscenario": f.get("codigo_de_escenario"),
+                        "@TipoFrase": f.get("tipo_frase")[:1]
+                    })
+            # Si solo hay una frase
+            else:
+                self.__d_frases = {
+                    "dte:Frase": {
+                        "@CodigoEscenario": phrases_to_doc[0].get("codigo_de_escenario"),
+                        "@TipoFrase": phrases_to_doc[0].get("tipo_frase")[:1]
+                    }
+                }
+
+            return True, 'OK'
+
+        except:
+            return False, 'Error, no se puedo obtener valor de Codigo Escenario y Tipo Frase'
 
     def items(self):
         """
@@ -465,21 +517,21 @@ class ElectronicAbonoNote:
                         nombre_corto = str(frappe.db.get_value('Item', {'name': self.__dat_items[i]['item_code']}, 'tax_name'))
                         codigo_uni_gravable = frappe.db.get_value('Item', {'name': self.__dat_items[i]['item_code']}, 'taxable_unit_code')
 
-                        #obj_item["dte:Impuestos"] = {}
-                        #obj_item["dte:Impuestos"]["dte:Impuesto"] = [
-                        #    {
-                        #        "dte:NombreCorto": self.__taxes_fact[0]['tax_name'],
-                        #        "dte:CodigoUnidadGravable": self.__taxes_fact[0]['taxable_unit_code'],
-                        #        "dte:MontoGravable": abs(flt(self.__dat_items[i]['facelec_gt_tax_net_fuel_amt'], self.__precision)),  # net_amount
-                        #        "dte:MontoImpuesto": abs(flt(self.__dat_items[i]['facelec_gt_tax_net_fuel_amt'] * (self.__taxes_fact[0]['rate']/100), self.__precision))
-                        #    },
-                        #    {
-                        #        "dte:NombreCorto": nombre_corto,
-                        #        "dte:CodigoUnidadGravable": codigo_uni_gravable,
-                        #        "dte:CantidadUnidadesGravables": abs(float(self.__dat_items[i]['qty'])),
-                        #        "dte:MontoImpuesto": abs(flt(self.__dat_items[i]['facelec_other_tax_amount'], self.__precision))
-                        #    }
-                        #]
+                        obj_item["dte:Impuestos"] = {}
+                        obj_item["dte:Impuestos"]["dte:Impuesto"] = [
+                            {
+                                "dte:NombreCorto": self.__taxes_fact[0]['tax_name'],
+                                "dte:CodigoUnidadGravable": self.__taxes_fact[0]['taxable_unit_code'],
+                                "dte:MontoGravable": abs(flt(self.__dat_items[i]['facelec_gt_tax_net_fuel_amt'], self.__precision)),  # net_amount
+                                "dte:MontoImpuesto": abs(flt(self.__dat_items[i]['facelec_gt_tax_net_fuel_amt'] * (self.__taxes_fact[0]['rate']/100), self.__precision))
+                            },
+                            {
+                                "dte:NombreCorto": nombre_corto,
+                                "dte:CodigoUnidadGravable": codigo_uni_gravable,
+                                "dte:CantidadUnidadesGravables": abs(float(self.__dat_items[i]['qty'])),
+                                "dte:MontoImpuesto": abs(flt(self.__dat_items[i]['facelec_other_tax_amount'], self.__precision))
+                            }
+                        ]
 
                         obj_item["dte:Total"] = abs(flt(self.__dat_items[i]['amount'], self.__precision))
 
@@ -507,6 +559,17 @@ class ElectronicAbonoNote:
                         obj_item["dte:PrecioUnitario"] = flt(abs(precio_uni), self.__precision)
                         obj_item["dte:Precio"] = flt(abs(precio_item), self.__precision)
                         obj_item["dte:Descuento"] = flt(abs(desc_fila), self.__precision)
+
+                        # Agregamos los impuestos
+                        obj_item["dte:Impuestos"] = {}
+                        obj_item["dte:Impuestos"]["dte:Impuesto"] = {}
+
+                        obj_item["dte:Impuestos"]["dte:Impuesto"]["dte:NombreCorto"] = self.__taxes_fact[0]['tax_name']
+                        obj_item["dte:Impuestos"]["dte:Impuesto"]["dte:CodigoUnidadGravable"] = self.__taxes_fact[0]['taxable_unit_code']
+                        obj_item["dte:Impuestos"]["dte:Impuesto"]["dte:MontoGravable"] = abs(flt(self.__dat_items[i]['net_amount'], self.__precision))
+                        obj_item["dte:Impuestos"]["dte:Impuesto"]["dte:MontoImpuesto"] = abs(flt(self.__dat_items[i]['net_amount'] *
+                                                                                                (self.__taxes_fact[0]['rate']/100), self.__precision))
+
                         obj_item["dte:Total"] = abs(flt(self.__dat_items[i]['amount'], self.__precision))
 
                     apply_oil_tax = False
@@ -520,23 +583,54 @@ class ElectronicAbonoNote:
         except:
             return False, 'No se pudo obtener data de los items en la factura {}, Error: {}'.format(self.__inv_credit_note, str(frappe.get_traceback()))
 
-    def complements(self):
+    def totals(self):
         """
-        Complemento para notas de credito, esto se debe aplicar sobre facturas electronicas ya emitidas,
-        especificando el porque del ajuste
+        Funcion encargada de realizar totales de los impuestos sobre la factura
 
         Returns:
-            bool: estado de operacion
+            tuple: True/False, msj, msj
         """
+
         try:
-            datos_fel_invoice = frappe.db.get_values('Envio FEL', filters={'serie_para_factura': self.__invoice_code},
-                                                     fieldname=['uuid', 'numero', 'serie', 'fecha'], as_dict=1)
-            fecha_procesada = datos_fel_invoice[0]["fecha"].split('T')[0]
+            is_idp = False
+            total_idp = 0
+            gran_tot = 0
+
+            for i in self.__dat_items:
+                gran_tot += flt(i['facelec_sales_tax_for_this_row'], self.__precision)
+                if cint(i['factelecis_fuel']) == 1:
+                    is_idp = True
+                    total_idp += flt(i['facelec_other_tax_amount'], self.__precision)
+
+            if is_idp == True:
+                self.__d_totales = {
+                    "dte:TotalImpuestos": {
+                        "dte:TotalImpuesto": [{
+                            "@NombreCorto": self.__taxes_fact[0]['tax_name'],  #"IVA",
+                            "@TotalMontoImpuesto": abs(flt(gran_tot, self.__precision))
+                        },
+                        {
+                            "@NombreCorto": "PETROLEO",  # VALOR FIJO
+                            "@TotalMontoImpuesto": abs(flt(total_idp, self.__precision))
+                        }]
+                    },
+                    "dte:GranTotal": abs(flt(self.dat_fac[0]['grand_total'], self.__precision))
+                }
+            else:
+                self.__d_totales = {
+                    "dte:TotalImpuestos": {
+                        "dte:TotalImpuesto": {
+                            "@NombreCorto": self.__taxes_fact[0]['tax_name'],  #"IVA",
+                            "@TotalMontoImpuesto": abs(flt(gran_tot, self.__precision))
+                        }
+                    },
+                    "dte:GranTotal": abs(flt(self.dat_fac[0]['grand_total'], self.__precision))
+                }
 
             return True, 'OK'
 
         except:
-            return False, 'No se pudo obtener datos para los complementos'
+            return False, 'No se pudo obtener data de la factura {}, Error: {}'.format(self.__inv_credit_note, str(frappe.get_traceback()))
 
     def adendas(self):
         """Funcion encargada de generar adendas a la factura en caso existan
@@ -577,7 +671,7 @@ class ElectronicAbonoNote:
             # To XML: Convierte de JSON a XML indentado
             self.__xml_string = xmltodict.unparse(self.__base_peticion, pretty=True)
             # Usar solo para debug
-            with open('PREVIEW-NOTA-ABONO-FEL.xml', 'w') as f:
+            with open('PREVIEW-NOTA-CREDITO-FEL.xml', 'w') as f:
                 f.write(self.__xml_string)
 
         except:
@@ -642,54 +736,6 @@ class ElectronicAbonoNote:
 
         except:
             return False, 'Error al tratar de firmar el documento electronico: '+str(frappe.get_traceback())
-    def totals(self):
-        """
-        Funcion encargada de realizar totales de los impuestos sobre la factura
-
-        Returns:
-            tuple: True/False, msj, msj
-        """
-
-        try:
-            is_idp = False
-            total_idp = 0
-            gran_tot = 0
-
-            for i in self.__dat_items:
-                gran_tot += flt(i['facelec_sales_tax_for_this_row'], self.__precision)
-                if cint(i['factelecis_fuel']) == 1:
-                    is_idp = True
-                    total_idp += flt(i['facelec_other_tax_amount'], self.__precision)
-
-            if is_idp == True:
-                self.__d_totales = {
-                    "dte:TotalImpuestos": {
-                        "dte:TotalImpuesto": [{
-                            "@NombreCorto": self.__taxes_fact[0]['tax_name'],  #"IVA",
-                            "@TotalMontoImpuesto": abs(flt(gran_tot, self.__precision))
-                        },
-                        {
-                            "@NombreCorto": "PETROLEO",  # VALOR FIJO
-                            "@TotalMontoImpuesto": abs(flt(total_idp, self.__precision))
-                        }]
-                    },
-                    "dte:GranTotal": abs(flt(self.dat_fac[0]['grand_total'], self.__precision))
-                }
-            else:
-                self.__d_totales = {
-                    "dte:TotalImpuestos": {
-                        "dte:TotalImpuesto": {
-                            "@NombreCorto": self.__taxes_fact[0]['tax_name'],  #"IVA",
-                            "@TotalMontoImpuesto": abs(flt(gran_tot, self.__precision))
-                        }
-                    },
-                    "dte:GranTotal": abs(flt(self.dat_fac[0]['grand_total'], self.__precision))
-                }
-
-            return True, 'OK'
-
-        except:
-            return False, 'No se pudo obtener data de la factura {}, Error: {}'.format(self.__inv_credit_note, str(frappe.get_traceback()))
 
     def request_electronic_invoice(self):
         """
@@ -776,10 +822,12 @@ class ElectronicAbonoNote:
                 resp_fel = frappe.new_doc("Envio FEL")
                 resp_fel.resultado = self.__response_ok['resultado']
                 resp_fel.status = 'Valid'
-                resp_fel.tipo_documento = 'Nota de Abono'
+                resp_fel.tipo_documento = 'Nota de Credito'
                 resp_fel.fecha = self.__response_ok['fecha']
                 resp_fel.origen = self.__response_ok['origen']
                 resp_fel.descripcion = self.__response_ok['descripcion']
+                resp_fel.serie_factura_original = self.__inv_credit_note
+                # resp_fel.serie_para_factura = 'FACELEC-'+str(self.__response_ok['numero'])
                 resp_fel.serie_para_factura = str(self.__response_ok['serie']).replace('*', '')+str(self.__response_ok['numero'])
 
                 if "control_emision" in self.__response_ok:
