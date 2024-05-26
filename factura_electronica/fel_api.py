@@ -12,6 +12,7 @@ from frappe import _
 from factura_electronica.controllers.journal_entry_special import JournalEntrySpecialISR
 from factura_electronica.fel.canceller import CancelDocument
 from factura_electronica.fel.credit_note import ElectronicCreditNote
+from factura_electronica.fel.abono_note import ElectronicAbonoNote
 from factura_electronica.fel.debit_note import ElectronicDebitNote
 from factura_electronica.fel.exchange_invoice import PurchaseExchangeInvoice, SalesExchangeInvoice
 from factura_electronica.fel.export_invoice import ExportInvoice
