@@ -26,7 +26,6 @@ class ElectronicAbonoNote:
         """
         self.__config_name = conf_name
         self.__naming_serie = naming_series
-        self.__reason = reason
         self.__inv_credit_note = actual_inv_name  # HACE REFERENCIA A LA NUEVA NOTA DE CREDITO
         self.__log_error = []
         self.__precision = get_currency_precision()
