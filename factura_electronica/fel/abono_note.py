@@ -63,6 +63,7 @@ class ElectronicAbonoNote:
                                     "dte:Emisor": self.__d_emisor,
                                     "dte:Receptor": self.__d_receptor,
                                     "dte:Items": self.__d_items,
+                                    "dte:Totales": self.__d_totales,
                                 }
                             }
                         }
@@ -112,9 +113,7 @@ class ElectronicAbonoNote:
         status_items = self.items()
         if status_items == False:
             return status_items
-
-
-
+            
         # Validacion y generacion seccion complementos
         status_complements = self.complements()
         if status_complements == False:
@@ -643,6 +642,54 @@ class ElectronicAbonoNote:
 
         except:
             return False, 'Error al tratar de firmar el documento electronico: '+str(frappe.get_traceback())
+    def totals(self):
+        """
+        Funcion encargada de realizar totales de los impuestos sobre la factura
+
+        Returns:
+            tuple: True/False, msj, msj
+        """
+
+        try:
+            is_idp = False
+            total_idp = 0
+            gran_tot = 0
+
+            for i in self.__dat_items:
+                gran_tot += flt(i['facelec_sales_tax_for_this_row'], self.__precision)
+                if cint(i['factelecis_fuel']) == 1:
+                    is_idp = True
+                    total_idp += flt(i['facelec_other_tax_amount'], self.__precision)
+
+            if is_idp == True:
+                self.__d_totales = {
+                    "dte:TotalImpuestos": {
+                        "dte:TotalImpuesto": [{
+                            "@NombreCorto": self.__taxes_fact[0]['tax_name'],  #"IVA",
+                            "@TotalMontoImpuesto": abs(flt(gran_tot, self.__precision))
+                        },
+                        {
+                            "@NombreCorto": "PETROLEO",  # VALOR FIJO
+                            "@TotalMontoImpuesto": abs(flt(total_idp, self.__precision))
+                        }]
+                    },
+                    "dte:GranTotal": abs(flt(self.dat_fac[0]['grand_total'], self.__precision))
+                }
+            else:
+                self.__d_totales = {
+                    "dte:TotalImpuestos": {
+                        "dte:TotalImpuesto": {
+                            "@NombreCorto": self.__taxes_fact[0]['tax_name'],  #"IVA",
+                            "@TotalMontoImpuesto": abs(flt(gran_tot, self.__precision))
+                        }
+                    },
+                    "dte:GranTotal": abs(flt(self.dat_fac[0]['grand_total'], self.__precision))
+                }
+
+            return True, 'OK'
+
+        except:
+            return False, 'No se pudo obtener data de la factura {}, Error: {}'.format(self.__inv_credit_note, str(frappe.get_traceback()))
 
     def request_electronic_invoice(self):
         """
