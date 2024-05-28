@@ -161,7 +161,7 @@ class ElectronicAbonoNote:
             # De la factura obtenemos la compañia y direccion compañia emisora
             self.dat_fac = frappe.db.get_values('Sales Invoice', filters={'name': self.__inv_credit_note},
                                                 fieldname=['company', 'company_address', 'nit_face_customer',
-                                                           'customer_address', 'customer_name', 'total_taxes_and_charges',
+                                                           'customer_address', 'customer_name',
                                                            'grand_total'], as_dict=1)
             if len(self.dat_fac) == 0:
                 return False, f'''No se encontro ninguna factura con serie: {self.__inv_credit_note}.\
@@ -479,9 +479,6 @@ class ElectronicAbonoNote:
                         obj_item["dte:Precio"] = flt(abs(precio_item), self.__precision)
                         obj_item["dte:Descuento"] = flt(abs(desc_fila), self.__precision)
 
-                        # Agregamos los impuestos
-
-                        obj_item["dte:Total"] = abs(flt(self.__dat_items[i]['amount'], self.__precision))
 
                     apply_oil_tax = False
                     items_ok.append(obj_item)
