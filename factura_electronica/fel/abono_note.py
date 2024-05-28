@@ -112,11 +112,6 @@ class ElectronicAbonoNote:
         if status_items == False:
             return status_items
 
-        # Validacion y generacion seccion totales
-        status_totals = self.totals()
-        if status_totals == False:
-            return status_totals
-
         # Validacion y generacion seccion adendas
         status_adendas = self.adendas()
         if status_adendas[0] == False:
