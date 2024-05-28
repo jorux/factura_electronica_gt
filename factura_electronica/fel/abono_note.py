@@ -499,21 +499,6 @@ class ElectronicAbonoNote:
 
         except:
             return False, 'No se pudo obtener data de los items en la factura {}, Error: {}'.format(self.__inv_credit_note, str(frappe.get_traceback()))
-
-    def totals(self):
-        """
-        Funcion encargada de realizar totales de los impuestos sobre la factura
-
-        Returns:
-            tuple: True/False, msj, msj
-        """
-
-        
-            
-        "dte:GranTotal": abs(flt(self.dat_fac[0]['grand_total'], self.__precision))
-               
-
-        return True, 'OK'
      
     def adendas(self):
         """Funcion encargada de generar adendas a la factura en caso existan
