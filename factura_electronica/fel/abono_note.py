@@ -479,6 +479,9 @@ class ElectronicAbonoNote:
                         obj_item["dte:Precio"] = flt(abs(precio_item), self.__precision)
                         obj_item["dte:Descuento"] = flt(abs(desc_fila), self.__precision)
 
+                        # Agregamos los impuestos
+
+                        obj_item["dte:Total"] = abs(flt(self.__dat_items[i]['amount'], self.__precision))
 
                     apply_oil_tax = False
                     items_ok.append(obj_item)
