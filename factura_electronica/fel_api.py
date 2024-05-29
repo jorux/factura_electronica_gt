@@ -357,8 +357,8 @@ def generate_nota_abono(invoice_code, naming_series):
 
         # PASO 3: NOTA DE ABONO ELECTRONICA
         # paso 3.1 - NUEVA INSTANCIA
-        # new_credit_note = ElectronicAbonoNote(invoice_code, status_config[1], naming_series, reason)
-        new_credit_note = ElectronicAbonoNote(actual_inv_name, status_config[1], naming_series)
+        # new_abono_note = ElectronicAbonoNote(invoice_code, status_config[1], naming_series, reason)
+        new_abono_note = ElectronicAbonoNote(actual_inv_name, status_config[1], naming_series)
 
         # PASO 3.2 - VALIDA LOS DATOS NECESARIOS PARA CONSTRUIR EL XML
         status = new_abono_note.build_abono_note()
@@ -370,14 +370,14 @@ def generate_nota_abono(invoice_code, naming_series):
 
         # PASO 4: FIRMA CERTIFICADA Y ENCRIPTADA
         # En este paso se convierte de JSON a XML y se codifica en base64
-        status_firma = new_credit_note.sign_invoice()
+        status_firma = new_abono_note.sign_invoice()
         if status_firma[0] == False:  # Si no se firma correctamente
             frappe.msgprint(msg=_(f'Ocurrio un problema al tratar de firmar Nota de Credito electronica, mas detalles en: {status_firma[1]}'),
                             title=_('Proceso no completado'), indicator='red')
             return False, f'Ocurrio un problema en el proceso, mas detalle en: {status_firma[1]}'
 
         # # PASO 5: SOLICITAMOS FACTURA ELECTRONICA
-        status_facelec = new_credit_note.request_electronic_invoice()
+        status_facelec = new_abono_note.request_electronic_invoice()
         if status_facelec[0] == False:
             frappe.msgprint(msg=_(f'Ocurrio un problema al tratar de generar Nota de Credito electronica, mas detalles en: {status_facelec[1]}'),
                             title=_('Proceso no completado'), indicator='red')
@@ -386,14 +386,14 @@ def generate_nota_abono(invoice_code, naming_series):
         # # PASO 6: VALIDAMOS LAS RESPUESTAS Y GUARDAMOS EL RESULTADO POR INFILE
         # # Las respuestas en este paso no son de gran importancia ya que las respuestas ok, seran guardadas
         # # automaticamente si todo va bien, aqui se retornara cualquier error que ocurra en la fase
-        status_res = new_credit_note.response_validator()
+        status_res = new_abono_note.response_validator()
         if (status_res[1]['status'] == 'ERROR') or (status_res[1]['status'] == 'ERROR VALIDACION'):
             frappe.msgprint(msg=_(f'Ocurrio un problema al tratar de generar nota de credito electronica con INFILE, mas detalle en {status_res[1]}'),
                             title=_('Proceso no completado'), indicator='red')
             return status_res  # return tuple
 
         # # PASO 7: ACTUALIZAMOS REGISTROS DE LA BASE DE DATOS
-        status_upgrade = new_credit_note.upgrade_records()
+        status_upgrade = new_abono_note.upgrade_records()
         if status_upgrade[0] == False:
             frappe.msgprint(msg=_(f'Ocurrio un problema al tratar de actualizar registros relacionados al documento, mas detalle en {status_upgrade[1]}'),
                             title=_('Proceso no completado'), indicator='red')
