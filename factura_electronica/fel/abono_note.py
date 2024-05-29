@@ -41,8 +41,7 @@ class ElectronicAbonoNote:
 
         # Datos del emisor
         self.emisor_data = {
-                "@AfiliacionIVA": frappe.db.get_value('Configuracion Factura Electronica',
-                                                     {'name': self.__config_name}, 'afiliacion_iva'),
+                "@AfiliacionIVA": "GEN",
                 "@CodigoEstablecimiento": dat_direccion[0]['facelec_establishment'],
                 "@CorreoEmisor": dat_direccion[0]['email_id'],
                 "@NITEmisor": str((dat_compania[0]['nit_face_company']).replace('-', '')).upper().strip(),
