@@ -390,14 +390,14 @@ def generate_nota_abono(invoice_code, naming_series):
         if (status_res[1]['status'] == 'ERROR') or (status_res[1]['status'] == 'ERROR VALIDACION'):
             frappe.msgprint(msg=_(f'Ocurrio un problema al tratar de generar nota de credito electronica con INFILE, mas detalle en {status_res[1]}'),
                             title=_('Proceso no completado'), indicator='red')
-            return status_res  # return tuple
+            return f'paso6, mas detalles en: {status_facelec[1]}'
 
         # # PASO 7: ACTUALIZAMOS REGISTROS DE LA BASE DE DATOS
         status_upgrade = new_abono_note.upgrade_records()
         if status_upgrade[0] == False:
             frappe.msgprint(msg=_(f'Ocurrio un problema al tratar de actualizar registros relacionados al documento, mas detalle en {status_upgrade[1]}'),
                             title=_('Proceso no completado'), indicator='red')
-            return status_upgrade
+            return  f'paso7, mas detalles en: {status_facelec[1]}'
 
         # PASO 8: SI cumple con exito el flujo de procesos se retorna una tupla, en ella va
         # # el UUID y la nueva serie para la factura
