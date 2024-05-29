@@ -361,7 +361,7 @@ def generate_nota_abono(invoice_code, naming_series):
         new_credit_note = ElectronicAbonoNote(actual_inv_name, status_config[1], naming_series)
 
         # PASO 3.2 - VALIDA LOS DATOS NECESARIOS PARA CONSTRUIR EL XML
-        status = new_credit_note.build_credit_note()
+        status = new_abono_note.build_abono_note()
         if status[0] == False:  # Si la construccion de la peticion es False
             frappe.msgprint(msg=_(f'Ocurrio un problema en el proceso de crear la petición para nota de credito electronica, mas detalle en: {status[1]}'),
                             title=_('Proceso no completado'), indicator='red')
