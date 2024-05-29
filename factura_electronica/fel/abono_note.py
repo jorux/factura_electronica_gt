@@ -28,7 +28,6 @@ class ElectronicAbonoNote:
             invoice_code (str): Serie original de la factura
             conf_name (str): Nombre configuracion para factura electronica
             naming_series (str): Serie de nombres
-            emisor_data (dict): Datos del emisor
             receptor_data (dict): Datos del receptor
             items (list): Lista de items
         """
@@ -110,7 +109,7 @@ class ElectronicAbonoNote:
                 else:
                     nombre_emisor = dat_compania[0]['company_name']
                     
-            self.emisor_data = {
+            self.__d_emisor = {
                 "@AfiliacionIVA": "GEN",
                 "@CodigoEstablecimiento": dat_direccion[0]['facelec_establishment'],
                 "@CorreoEmisor": dat_direccion[0]['email_id'],
@@ -349,22 +348,22 @@ class ElectronicAbonoNote:
                                 "dte:DatosEmision": {
                                     "@ID": "DatosEmision",
                                     "dte:DatosGenerales": {
-                                        "@CodigoMoneda": self.emisor_data.get('CodigoMoneda', 'GTQ'),
+                                        "@CodigoMoneda": self.__d_emisor.get('CodigoMoneda', 'GTQ'),
                                         "@FechaHoraEmision": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-06:00"),
                                         "@Tipo": "NABN"
                                     },
                                     "dte:Emisor": {
-                                        "@AfiliacionIVA": self.emisor_data.get('AfiliacionIVA', 'GEN'),
-                                        "@CodigoEstablecimiento": self.emisor_data.get('CodigoEstablecimiento', '1'),
-                                        "@NITEmisor": self.emisor_data.get('NITEmisor', '9000000000K'),
-                                        "@NombreComercial": self.emisor_data.get('NombreComercial', 'INFILE, SOCIEDAD ANONIMA'),
-                                        "@NombreEmisor": self.emisor_data.get('NombreEmisor', 'INFILE, SOCIEDAD ANONIMA'),
+                                        "@AfiliacionIVA": self.__d_emisor.get('AfiliacionIVA', 'GEN'),
+                                        "@CodigoEstablecimiento": self.__d_emisor.get('CodigoEstablecimiento', '1'),
+                                        "@NITEmisor": self.__d_emisor.get('NITEmisor', '9000000000K'),
+                                        "@NombreComercial": self.__d_emisor.get('NombreComercial', 'INFILE, SOCIEDAD ANONIMA'),
+                                        "@NombreEmisor": self.__d_emisor.get('NombreEmisor', 'INFILE, SOCIEDAD ANONIMA'),
                                         "dte:DireccionEmisor": {
-                                            "dte:Direccion": self.emisor_data.get('Direccion', 'CUIDAD'),
-                                            "dte:CodigoPostal": self.emisor_data.get('CodigoPostal', '01010'),
-                                            "dte:Municipio": self.emisor_data.get('Municipio', 'GUATEMALA'),
-                                            "dte:Departamento": self.emisor_data.get('Departamento', 'GUATEMALA'),
-                                            "dte:Pais": self.emisor_data.get('Pais', 'GT')
+                                            "dte:Direccion": self.__d_emisor.get('Direccion', 'CUIDAD'),
+                                            "dte:CodigoPostal": self.__d_emisor.get('CodigoPostal', '01010'),
+                                            "dte:Municipio": self.__d_emisor.get('Municipio', 'GUATEMALA'),
+                                            "dte:Departamento": self.__d_emisor.get('Departamento', 'GUATEMALA'),
+                                            "dte:Pais": self.__d_emisor.get('Pais', 'GT')
                                         }
                                     },
                                     "dte:Receptor": {
