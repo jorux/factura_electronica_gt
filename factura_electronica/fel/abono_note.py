@@ -410,8 +410,9 @@ class ElectronicAbonoNote:
                 return False, "Error en la validación de los datos", status_validate[1]
 
         except Exception as e:
-            frappe.log_error(message=str(e), title="Error en la construcción de la nota de abono")
-            return False, "Ocurrió un error en la construcción de la nota de abono", str(e)
+            error_message = f"Error en la construcción de la nota de abono: {str(e)}"
+            frappe.log_error(message=error_message, title="Error en la construcción de la nota de abono")
+            return False, error_message, str(e)
 
     def validate(self):
         """
