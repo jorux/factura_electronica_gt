@@ -40,7 +40,77 @@ class ElectronicAbonoNote:
         self.__tiene_adenda = False
 
         # Datos del emisor
-        self.emisor_data = {
+    def sender(self):
+        """
+        Valida y obtiene la data necesaria para la seccion de Emisor,
+        entidad que emite la factura
+
+        Returns:
+            tuple: True/False, msj, msj
+        """
+
+        try:
+            # De la factura obtenemos la compañia y direccion compañia emisora
+            self.dat_fac = frappe.db.get_values('Sales Invoice', filters={'name': self.__inv_credit_note},
+                                                fieldname=['company', 'company_address', 'nit_face_customer',
+                                                           'customer_address', 'customer_name', 'total_taxes_and_charges',
+                                                           'grand_total'], as_dict=1)
+            if len(self.dat_fac) == 0:
+                return False, f'''No se encontro ninguna factura con serie: {self.__inv_credit_note}.\
+                                  Por favor valida los datos de la factura que deseas procesar'''
+
+
+            # Obtenemos datos necesario de company: Nombre de compañia, nit
+            dat_compania = frappe.db.get_values('Company', filters={'name': self.dat_fac[0]['company']},
+                                                fieldname=['company_name', 'nit_face_company', 'tax_id'],
+                                                as_dict=1)
+            if len(dat_compania) == 0:
+                return False, f'''No se encontraron datos para la compañia {self.dat_fac[0]["company_name"]}.
+                                  Verifica que la factura que deseas procesar tenga una compañia valida'''
+
+
+            # De la compañia, obtenemos direccion 1, email, codigo postal, departamento, municipio, pais
+            dat_direccion = frappe.db.get_values('Address', filters={'name': self.dat_fac[0]['company_address']},
+                                                 fieldname=['address_line1', 'email_id', 'pincode', 'county',
+                                                            'state', 'city', 'country', 'facelec_establishment'],
+                                                 as_dict=1)
+            if len(dat_direccion) == 0:
+                return False, f'No se encontro ninguna direccion de la compania {dat_compania[0]["company_name"]},\
+                                verifica que exista una, con data en los campos address_line1, email_id, pincode, state,\
+                                city, country, y vuelve a generar la factura'
+
+
+            # LA ENTIDAD EMISORA SI O SI DEBE TENER ESTOS DATOS :D
+            # Validacion de existencia en los campos de direccion, ya que son obligatorio por parte de la API FEL
+            # Usaremos la primera que se encuentre
+            for dire in dat_direccion[0]:
+                if not dat_direccion[0][dire]:
+                    return False, '''No se puede completar la operacion ya que el campo {} de la direccion de compania no\
+                                     tiene data, por favor asignarle un valor e intentar de nuevo'''.format(str(dire))
+
+            # Si en configuracion de factura electronica esta seleccionada la opcion de usar datos de prueba
+            if frappe.db.get_value('Configuracion Factura Electronica',
+                                  {'name': self.__config_name}, 'usar_datos_prueba') == 1:
+                nom_comercial = frappe.db.get_value('Configuracion Factura Electronica',
+                                                   {'name': self.__config_name}, 'nombre_empresa_prueba')
+
+                # Si la compania es de un propietario
+                if frappe.db.get_value('Configuracion Factura Electronica', {'name': self.__config_name}, 'is_individual'):
+                    nombre_emisor = frappe.db.get_value('Configuracion Factura Electronica', {'name': self.__config_name}, 'facelec_name_of_owner')
+                else:
+                    nombre_emisor = nom_comercial
+
+            # Aplica Si los datos son para producción
+            else:
+                nom_comercial = dat_compania[0]['company_name']
+
+                # Si la compania es de un propietario
+                if frappe.db.get_value('Configuracion Factura Electronica', {'name': self.__config_name}, 'is_individual'):
+                    nombre_emisor = frappe.db.get_value('Configuracion Factura Electronica', {'name': self.__config_name}, 'facelec_name_of_owner')
+                else:
+                    nombre_emisor = dat_compania[0]['company_name']
+                    
+            self.emisor_data = {
                 "@AfiliacionIVA": "GEN",
                 "@CodigoEstablecimiento": dat_direccion[0]['facelec_establishment'],
                 "@CorreoEmisor": dat_direccion[0]['email_id'],
@@ -55,10 +125,26 @@ class ElectronicAbonoNote:
                     "dte:Pais": frappe.db.get_value('Country', {'name': dat_direccion[0]['country']}, 'code').upper()  # CODIG PAIS
                 }
             }
+            return True, 'OK'
 
-        
+        except:
+            return False, 'Proceso no completado, no se pudieron obtener todos los datos necesarios, verifica tener todos\
+                           los campos necesario en Configuracion Factura Electronica. Mas detalles en: \n'+str(frappe.get_traceback())
+    def receiver(self):
+        """
+        Validacion y generacion datos de Receptor (cliente)
+
+        Returns:
+            tuple: True/False, msj, msj
+        """
+
+        # Intentara obtener data de direccion cliente
+        try:
+            dat_direccion = frappe.db.get_values('Address', filters={'name': self.dat_fac[0]['customer_address']},
+                                                 fieldname=['address_line1', 'email_id', 'pincode',
+                                                            'state', 'city', 'country'], as_dict=1)    
         # Datos del receptor
-        self.receptor_data = frappe.db.get_values('Address', filters={'name': self.dat_fac[0]['customer_address']},
+            self.receptor_data = frappe.db.get_values('Address', filters={'name': self.dat_fac[0]['customer_address']},
                                                  fieldname=['address_line1', 'email_id', 'pincode',
                                                             'state', 'city', 'country'], as_dict=1)
             # NOTE: se quitara esta validacion para permitir usar valores default en caso no exista una direccion
@@ -75,7 +161,24 @@ class ElectronicAbonoNote:
             #                       '''.format(str(dire), self.dat_fac[0]["customer_name"])
 
         # Items de la nota
-        self.items = rappe.db.get_values('Sales Invoice Item', filters={'parent': str(self.__inv_credit_note)},
+            return True, 'OK'
+
+        except:
+            return False, 'No se pudo obtener data de los items en la factura {}, Error: {}'.format(self.__inv_credit_note, str(frappe.get_traceback()))
+
+    def items(self):
+        """
+        Procesa todos los items de la factura aplicando calculos necesarios para la SAT
+
+        Returns:
+            tuple: True/False, msj, msj
+        """
+
+        try:
+            i_fel = {}  # Guardara la seccion de items ok
+            items_ok = []  # Guardara todos los items OK
+    
+            self.items = rappe.db.get_values('Sales Invoice Item', filters={'parent': str(self.__inv_credit_note)},
                                              fieldname=['item_name', 'qty', 'item_code', 'description',
                                                         'net_amount', 'base_net_amount', 'discount_percentage',
                                                         'discount_amount', 'price_list_rate', 'net_rate',
@@ -88,17 +191,17 @@ class ElectronicAbonoNote:
                                                         'facelec_gt_tax_net_services_amt', 'facelec_is_discount',
                                                         'facelec_tax_rate_per_uom'], order_by='idx asc', as_dict=True)
 
-        switch_item_description = frappe.db.get_value('Configuracion Factura Electronica', {'name': self.__config_name}, 'descripcion_item')
+            switch_item_description = frappe.db.get_value('Configuracion Factura Electronica', {'name': self.__config_name}, 'descripcion_item')
 
             # Obtenemos los impuesto cofigurados para x compañia en la factura
-        self.__taxes_fact = frappe.db.get_values('Sales Taxes and Charges', filters={'parent': self.__inv_credit_note},
+            self.__taxes_fact = frappe.db.get_values('Sales Taxes and Charges', filters={'parent': self.__inv_credit_note},
                                                      fieldname=['tax_name', 'taxable_unit_code', 'rate'], as_dict=True)
 
             # Verificamos la cantidad de items
-        longitems = len(self.__dat_items)
-        apply_oil_tax = False
+            longitems = len(self.__dat_items)
+            apply_oil_tax = False
 
-        if longitems != 0:
+            if longitems != 0:
                 contador = 0  # Utilizado para enumerar las lineas en factura electronica
 
                 # Si existe un solo item a facturar la iteracion se hara una vez, si hay mas lo contrario mas iteraciones
@@ -212,8 +315,13 @@ class ElectronicAbonoNote:
                     apply_oil_tax = False
                     items_ok.append(obj_item)
 
-        i_fel = {"dte:Item": items_ok}
-        self.__d_items = i_fel
+            i_fel = {"dte:Item": items_ok}
+            self.__d_items = i_fel
+            return True, 'OK'
+
+        except:
+            return False, 'Proceso no completado, no se pudieron obtener todos los datos necesarios, verifica tener todos\
+                           los campos necesario en Configuracion Factura Electronica. Mas detalles en: \n'+str(frappe.get_traceback())
 
     def build_abono_note(self):
         """
