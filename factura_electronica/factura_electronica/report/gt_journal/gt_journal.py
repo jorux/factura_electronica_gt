@@ -82,7 +82,7 @@ def get_all_data(filters):
     data = []
 
     
-        journal_entries = frappe.db.sql('''SELECT name, total_debit, total_credit, posting_date
+    journal_entries = frappe.db.sql('''SELECT name, total_debit, total_credit, posting_date
                                         FROM `tabJournal Entry`
                                         WHERE posting_date BETWEEN %(fecha_inicio)s
                                         AND %(fecha_final)s AND company=%(compa)s''',
