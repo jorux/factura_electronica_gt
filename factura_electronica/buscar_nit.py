@@ -7,7 +7,8 @@ def buscar_nombre (doc, method):
     try:
         # Your custom logic here
         # Example: Accessing Sales Invoice data
-        llave = frappe.db.sql("SELECT `tabConfiguracion Factura Electronica`.`llave_ws` AS `llave_ws`FROM`tabConfiguracion Factura Electronica`WHERE`tabConfiguracion Factura Electronica`.`docstatus` = 1")
+        llave = frappe.db.sql("SELECT `tabConfiguracion Factura Electronica`.`llave_ws` FROM`tabConfiguracion Factura Electronica`WHERE`tabConfiguracion Factura Electronica`.`docstatus` = 1")
+        alias = frappe.db.sql("SELECT `tabConfiguracion Factura Electronica`.`Alias``FROM`tabConfiguracion Factura Electronica`WHERE`tabConfiguracion Factura Electronica`.`docstatus` = 1")
         frappe.log_error(f", llave: {llave}, nit {doc.nit_face_customer}", "Sales Invoice On Submit Info")
 
         #Add here the code that interacts with the guatemalan electronical invoice system.
