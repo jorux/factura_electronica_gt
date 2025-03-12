@@ -13,12 +13,13 @@ def buscar_nombre (doc, method):
         llave = frappe.db.sql("SELECT `tabConfiguracion Factura Electronica`.`llave_ws` FROM`tabConfiguracion Factura Electronica`WHERE`tabConfiguracion Factura Electronica`.`docstatus` = 1")
         alias = frappe.db.sql("SELECT `tabConfiguracion Factura Electronica`.`Alias` FROM`tabConfiguracion Factura Electronica`WHERE`tabConfiguracion Factura Electronica`.`docstatus` = 1")
         nit = doc.nit_face_customer
-       
+        
         payload = {
             "emisor_codigo": alias,
             "emisor_clave": llave,
             "nit_consulta": nit
         }
+        frappe.log_error(f"Respuesta de la API FEL: {data}", "API FEL pregunta")
         payload_json = json.dumps(payload).encode('utf-8')
 
         # Configurar la solicitud POST
