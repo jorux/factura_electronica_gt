@@ -1,4 +1,7 @@
 import frappe
+import urllib.request
+import urllib.parse
+import json
 
 def buscar_nombre (doc, method):
     """
@@ -9,10 +12,25 @@ def buscar_nombre (doc, method):
         # Example: Accessing Sales Invoice data
         llave = frappe.db.sql("SELECT `tabConfiguracion Factura Electronica`.`llave_ws` FROM`tabConfiguracion Factura Electronica`WHERE`tabConfiguracion Factura Electronica`.`docstatus` = 1")
         alias = frappe.db.sql("SELECT `tabConfiguracion Factura Electronica`.`Alias``FROM`tabConfiguracion Factura Electronica`WHERE`tabConfiguracion Factura Electronica`.`docstatus` = 1")
-        frappe.log_error(f", llave: {llave}, nit {doc.nit_face_customer}", "Sales Invoice On Submit Info")
+        nit = doc.nit_face_customer
+       
+        payload = {
+            "emisor_codigo": alias,
+            "emisor_clave": llave,
+            "nit_consulta": nit
+        }
+        payload_json = json.dumps(payload).encode('utf-8')
 
-        #Add here the code that interacts with the guatemalan electronical invoice system.
-        #For example, sending the invoice data to the API.
+        # Configurar la solicitud POST
+        url = "https://consultareceptores.feel.com.gt/rest/action"
+        headers = {'Content-Type': 'application/json'}
+        req = urllib.request.Request(url, data=payload_json, headers=headers)
 
-    except Exception as e:
-        frappe.log_error(f"Error in custom script: {e}", "Sales Invoice On Submit Error")
+        # Realizar la solicitud
+        with urllib.request.urlopen(req) as response:
+            response_json = json.loads(response.read().decode('utf-8'))
+            frappe.log_error(f"Respuesta de la API FEL: {response_json}", "API FEL Respuesta")
+            # Aquí podrías procesar la respuesta (response_json)
+        return response_json
+
+        
