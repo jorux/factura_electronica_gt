@@ -36,7 +36,7 @@ def buscar_nombre (doc, method):
             # Extraer el nombre y asignarlo a doc.nombre_segun_sat
             if response_json and 'nombre' in response_json:
                 nombre = response_json['nombre']
-                frappe.db.set_value("Sales Invoice", doc.name, nombre_segun_sat, nombre)
+                frappe.db.set_value("Sales Invoice",{"name":doc.name},{"nombre_segun_sat":nombre})
                 frappe.log_error(f"Nombre extraído: {nombre}", "Nombre Extraído") #Log para confirmar nombre extraido
 
             else:
