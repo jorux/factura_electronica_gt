@@ -10,8 +10,10 @@ def buscar_nombre (doc, method):
     try:
         # Your custom logic here
         # Example: Accessing Sales Invoice data
-        llave = frappe.db.sql("SELECT `tabConfiguracion Factura Electronica`.`llave_ws` FROM`tabConfiguracion Factura Electronica`WHERE`tabConfiguracion Factura Electronica`.`docstatus` = 1")
-        alias = frappe.db.sql("SELECT `tabConfiguracion Factura Electronica`.`Alias` FROM`tabConfiguracion Factura Electronica`WHERE`tabConfiguracion Factura Electronica`.`docstatus` = 1")
+        result_llave = frappe.db.sql("SELECT `tabConfiguracion Factura Electronica`.`llave_ws` FROM `tabConfiguracion Factura Electronica` WHERE `tabConfiguracion Factura Electronica`.`docstatus` = 1")
+        llave = result_llave[0][0] if result_llave else None #Extrae la llave, si no existe devuelve None.
+        result_alias = frappe.db.sql("SELECT `tabConfiguracion Factura Electronica`.`Alias` FROM `tabConfiguracion Factura Electronica` WHERE `tabConfiguracion Factura Electronica`.`docstatus` = 1")
+        alias = result_alias[0][0] if result_alias else None #Extrae el alias, si no existe devuelve None.
         nit = doc.nit_face_customer
         
         payload = {
