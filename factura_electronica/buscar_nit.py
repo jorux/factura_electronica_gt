@@ -19,8 +19,8 @@ def buscar_nombre (doc, method):
             "emisor_clave": llave,
             "nit_consulta": nit
         }
-        frappe.log_error(f"Respuesta de la API FEL: {data}", "API FEL pregunta")
         payload_json = json.dumps(payload).encode('utf-8')
+        frappe.log_error(f"Respuesta de la API FEL: {payload_json}", "API FEL pregunta")
 
         # Configurar la solicitud POST
         url = "https://consultareceptores.feel.com.gt/rest/action"
