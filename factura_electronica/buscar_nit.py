@@ -33,4 +33,6 @@ def buscar_nombre (doc, method):
             # Aquí podrías procesar la respuesta (response_json)
         return response_json
 
-        
+    except Exception as e:
+            frappe.log_error(f"Error al conectar con la API de FEL: {e}", "Buscar NIT")
+            return None
