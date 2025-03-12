@@ -33,7 +33,15 @@ def buscar_nombre (doc, method):
         with urllib.request.urlopen(req) as response:
             response_json = json.loads(response.read().decode('utf-8'))
             frappe.log_error(f"Respuesta de la API FEL: {response_json}", "API FEL Respuesta")
-            # Aquí podrías procesar la respuesta (response_json)
+            # Extraer el nombre y asignarlo a doc.nombre_segun_sat
+            if response_json and 'nombre' in response_json:
+                nombre = response_json['nombre']
+                doc.nombre_segun_sat = nombre
+                frappe.log_error(f"Nombre extraído: {nombre}", "Nombre Extraído") #Log para confirmar nombre extraido
+
+            else:
+                 frappe.log_error("La respuesta de la API no contiene el campo 'nombre'", "Error Extracción Nombre") #Log en caso de no existir nombre.
+
         return response_json
 
     except Exception as e:
