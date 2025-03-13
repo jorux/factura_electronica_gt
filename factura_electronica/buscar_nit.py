@@ -23,7 +23,13 @@ def buscar_nombre (doc, method):
                 "nit_consulta": nit
             }
             payload_json = json.dumps(payload).encode('utf-8')
-            
+            #test
+            self_dat_fac = frappe.db.get_values('Sales Invoice', filters={'name': self.__invoice_code},
+                                                fieldname=['company', 'company_address', 'nit_face_customer',
+                                                           'customer_address', 'customer_name', 'total_taxes_and_charges',
+                                                           'grand_total','nombre_segun_sat'], as_dict=1)
+            frappe.log_error(f"Detalles de self.dat ", {self_dat_fac})
+ 
 
             # Configurar la solicitud POST
             url = "https://consultareceptores.feel.com.gt/rest/action"
