@@ -273,7 +273,7 @@ class ElectronicInvoice:
 
             datos_default = {
                 'email': frappe.db.get_value('Configuracion Factura Electronica',  {'name': self.__config_name}, 'correo_copia'),
-                'nombre_segun_sat': 'Consumidor Final',
+                'customer_name': 'Consumidor Final',
                 'address': 'Guatemala',
                 'pincode': '0',
                 'municipio': 'Guatemala',
@@ -285,7 +285,7 @@ class ElectronicInvoice:
                 self.__default_address = True
                 datos_default = {
                     'email': frappe.db.get_value('Configuracion Factura Electronica',  {'name': self.__config_name}, 'correo_copia'),
-                    'nombre_segun_sat': 'Consumidor Final',
+                    'customer_name': 'Consumidor Final',
                     'address': 'Guatemala',
                     'pincode': '0',
                     'municipio': 'Guatemala',
