@@ -24,7 +24,7 @@ def buscar_nombre (doc, method):
             }
             payload_json = json.dumps(payload).encode('utf-8')
             #test
-            self_dat_fac = frappe.db.get_values('Sales Invoice', filters={'name': self.__invoice_code},
+            self_dat_fac = frappe.db.get_values('Sales Invoice', filters={'name':doc.name},
                                                 fieldname=['company', 'company_address', 'nit_face_customer',
                                                            'customer_address', 'customer_name', 'total_taxes_and_charges',
                                                            'grand_total','nombre_segun_sat'], as_dict=1)
