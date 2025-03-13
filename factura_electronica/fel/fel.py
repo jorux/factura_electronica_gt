@@ -183,6 +183,7 @@ class ElectronicInvoice:
                                                 fieldname=['company', 'company_address', 'nit_face_customer',
                                                            'customer_address', 'customer_name', 'total_taxes_and_charges',
                                                            'grand_total','nombre_segun_sat'], as_dict=1)
+            frappe.log_error(f"Detalles de self.dat ", {self.dat_fac})
             if len(self.dat_fac) == 0:
                 return False, f'''No se encontro ninguna factura con serie: {self.__invoice_code}.\
                                   Por favor valida los datos de la factura que deseas procesar'''
