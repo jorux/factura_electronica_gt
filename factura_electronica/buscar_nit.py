@@ -28,7 +28,7 @@ def buscar_nombre (doc, method):
                                                 fieldname=['company', 'company_address', 'nit_face_customer',
                                                            'customer_address', 'customer_name', 'total_taxes_and_charges',
                                                            'grand_total','nombre_segun_sat'], as_dict=1)
-            frappe.log_error(f"Detalles de self.dat ", {self_dat_fac})
+            frappe.log_error(f"Detalles de selfdat ", {self_dat_fac})
  
 
             # Configurar la solicitud POST
