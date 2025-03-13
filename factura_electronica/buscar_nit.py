@@ -23,7 +23,7 @@ def buscar_nombre (doc, method):
                 "nit_consulta": nit
             }
             payload_json = json.dumps(payload).encode('utf-8')
-            frappe.log_error(f"Respuesta de la API FEL: ", {payload_json})
+            
 
             # Configurar la solicitud POST
             url = "https://consultareceptores.feel.com.gt/rest/action"
@@ -33,13 +33,10 @@ def buscar_nombre (doc, method):
             # Realizar la solicitud
             with urllib.request.urlopen(req) as response:
                 response_json = json.loads(response.read().decode('utf-8'))
-                frappe.log_error(f"Respuesta de la API FEL: {response_json}", "API FEL Respuesta")
                 # Extraer el nombre y asignarlo a doc.nombre_segun_sat
                 if response_json and 'nombre' in response_json:
                     nombre = response_json['nombre']
                     frappe.db.set_value("Sales Invoice",{"name":doc.name},{"nombre_segun_sat":nombre})
-                    frappe.log_error(f"Nombre extraído: {nombre}", "Nombre Extraído") #Log para confirmar nombre extraido
-
                 else:
                     frappe.log_error("La respuesta de la API no contiene el campo 'nombre'", "Error Extracción Nombre") #Log en caso de no existir nombre.
 
@@ -64,7 +61,6 @@ def buscar_nombre (doc, method):
                 "cui": nit
             }
             payload_json = json.dumps(payload).encode('utf-8')
-            frappe.log_error(f"Respuesta de la API FEL: ", {payload_json})
 
             # Configurar la solicitud POST
             url = "https://consultareceptores.feel.com.gt/rest/action"
@@ -74,12 +70,10 @@ def buscar_nombre (doc, method):
             # Realizar la solicitud
             with urllib.request.urlopen(req) as response:
                 response_json = json.loads(response.read().decode('utf-8'))
-                frappe.log_error(f"Respuesta de la API FEL: {response_json}", "API FEL Respuesta")
                 # Extraer el nombre y asignarlo a doc.nombre_segun_sat
                 if response_json and 'nombre' in response_json:
                     nombre = response_json['nombre']
                     frappe.db.set_value("Sales Invoice",{"name":doc.name},{"nombre_segun_sat":nombre})
-                    frappe.log_error(f"Nombre extraído: {nombre}", "Nombre Extraído") #Log para confirmar nombre extraido
 
                 else:
                     frappe.log_error("La respuesta de la API no contiene el campo 'nombre'", "Error Extracción Nombre") #Log en caso de no existir nombre.
