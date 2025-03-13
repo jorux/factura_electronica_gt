@@ -73,7 +73,7 @@ def buscar_nombre (doc, method):
                 if response_json and 'nombre' in response_json:
                     nombre = response_json['nombre']
                     frappe.db.set_value("Sales Invoice",{"name":doc.name},{"nombre_segun_sat":nombre})
-
+                    frappe.db.set_value("Sales Invoice",{"name":doc.name},{"customer_name":nombre})
                 else:
                     frappe.log_error("La respuesta de la API no contiene el campo 'nombre'", "Error Extracción Nombre") #Log en caso de no existir nombre.
 
