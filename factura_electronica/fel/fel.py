@@ -182,8 +182,7 @@ class ElectronicInvoice:
             self.dat_fac = frappe.db.get_values('Sales Invoice', filters={'name': self.__invoice_code},
                                                 fieldname=['company', 'company_address', 'nit_face_customer',
                                                            'customer_address', 'customer_name', 'total_taxes_and_charges',
-                                                           'grand_total','nombre_segun_sat'], as_dict=1)
-            frappe.log_error(f"Detalles de self.dat ", {self.dat_fac})
+                                                           'grand_total'], as_dict=1)
             if len(self.dat_fac) == 0:
                 return False, f'''No se encontro ninguna factura con serie: {self.__invoice_code}.\
                                   Por favor valida los datos de la factura que deseas procesar'''
@@ -300,7 +299,7 @@ class ElectronicInvoice:
                     self.__d_receptor = {
                         "@CorreoReceptor": datos_default.get('email'),
                         "@IDReceptor": str((self.dat_fac[0]['nit_face_customer']).replace('/', '').replace('-', '')).upper().strip(),  # NIT => CF
-                        "@NombreReceptor": str(self.dat_fac[0]["nombre_segun_sat"]),
+                        "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
                         "dte:DireccionReceptor": {
                             "dte:Direccion": datos_default.get('address'),
                             "dte:CodigoPostal": datos_default.get('pincode'),
@@ -313,7 +312,7 @@ class ElectronicInvoice:
                     self.__d_receptor = {
                         "@CorreoReceptor": datos_default.get('email'),
                         "@IDReceptor": str((self.dat_fac[0]['nit_face_customer']).replace('/', '').replace('-', '')).upper().strip(),  # NIT
-                        "@NombreReceptor": str(self.dat_fac[0]["nombre_segun_sat"]),
+                        "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
                         "dte:DireccionReceptor": {
                             "dte:Direccion": datos_default.get('address'),
                             "dte:CodigoPostal": datos_default.get('pincode'),
@@ -331,7 +330,7 @@ class ElectronicInvoice:
                     self.__d_receptor = {
                         "@CorreoReceptor": dat_direccion[0].get('email_id', datos_default.get('email')),
                         "@IDReceptor": str((self.dat_fac[0]['nit_face_customer']).replace('/', '').replace('-', '')).upper().strip(),  # NIT => CF
-                        "@NombreReceptor": str(self.dat_fac[0]["nombre_segun_sat"]),
+                        "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
                         "dte:DireccionReceptor": {
                             "dte:Direccion": dat_direccion[0].get('address_line1', datos_default.get('address')),
                             "dte:CodigoPostal": dat_direccion[0].get('pincode', datos_default.get('pincode')),
@@ -344,7 +343,7 @@ class ElectronicInvoice:
                     self.__d_receptor = {
                         "@CorreoReceptor": dat_direccion[0].get('email_id', datos_default.get('email')),
                         "@IDReceptor": str((self.dat_fac[0]['nit_face_customer']).replace('/', '').replace('-', '')).upper().strip(),  # NIT
-                        "@NombreReceptor": str(self.dat_fac[0]["nombre_segun_sat"]),
+                        "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
                         "@TipoEspecial": str('CUI'), 
                         "dte:DireccionReceptor": {
                             "dte:Direccion": dat_direccion[0].get('address_line1', datos_default.get('address')),
@@ -358,7 +357,7 @@ class ElectronicInvoice:
                     self.__d_receptor = {
                         "@CorreoReceptor": dat_direccion[0].get('email_id', datos_default.get('email')),
                         "@IDReceptor": str((self.dat_fac[0]['nit_face_customer']).replace('/', '').replace('-', '')).upper().strip(),  # NIT
-                        "@NombreReceptor": str(self.dat_fac[0]["nombre_segun_sat"]),
+                        "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
                         "dte:DireccionReceptor": {
                             "dte:Direccion": dat_direccion[0].get('address_line1', datos_default.get('address')),
                             "dte:CodigoPostal": dat_direccion[0].get('pincode', datos_default.get('pincode')),
