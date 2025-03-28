@@ -7,7 +7,7 @@ def buscar_nombre (doc, method):
     """
     Busca el nombre con la API de INFILE
     """
-    if doc.es_dpi == False:
+    if doc.es_dpi == False and doc.es_pasaporte == False:
         try:
             # Your custom logic here
             # Example: Accessing Sales Invoice data
