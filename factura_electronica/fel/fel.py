@@ -718,7 +718,7 @@ class ElectronicInvoice:
             # Usar solo para debug
             with open('PREVIEW-FACTURA-FEL.xml', 'w') as f:
                 f.write(self.__xml_string)
-            frappe.log_error(f"XML Generado", self.__xml_string)
+            #frappe.log_error(f"XML Generado", self.__xml_string) - activar para ver el xml generado y debuggear
         except:
             return False, 'La peticion no se pudo convertir a XML. Si la falla persiste comunicarse con soporte'
 
