@@ -356,7 +356,7 @@ class ElectronicInvoice:
                 elif frappe.db.get_value('Sales Invoice', {'name': self.__invoice_code}, 'es_pasaporte') == True:
                     self.__d_receptor = {
                         "@CorreoReceptor": dat_direccion[0].get('email_id', datos_default.get('email')),
-                        "@IDReceptor": str((self.dat_fac[0]['nit_face_customer']).replace('/', '').replace('-', '')).upper().strip(),  # NIT
+                        "@IDReceptor": str(self.dat_fac[0]['nit_face_customer']),  # NIT
                         "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
                         "@TipoEspecial": str('EXT'), 
                         "dte:DireccionReceptor": {
