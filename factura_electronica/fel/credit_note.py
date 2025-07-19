@@ -247,26 +247,7 @@ class ElectronicCreditNote:
                     nombre_emisor = dat_compania[0]['company_name']
 
             # Asignacion data
-            if frappe.db.get_value('Sales Invoice', {'name': self.__invoice_code}, 'es_dpi') == 1:
-                self.__d_emisor = {
-                    "@AfiliacionIVA": frappe.db.get_value('Configuracion Factura Electronica',
-                                                        {'name': self.__config_name}, 'afiliacion_iva'),
-                    "@CodigoEstablecimiento": dat_direccion[0]['facelec_establishment'],
-                    "@CorreoEmisor": dat_direccion[0]['email_id'],
-                    "@IDReceptor": str((dat_compania[0]['nit_face_company']).replace('-', '')).upper().strip(),
-                    "@TipoEspecial": str('CUI'),
-                    "@NombreComercial": nom_comercial,
-                    "@NombreEmisor": nombre_emisor,
-                    "dte:DireccionEmisor": {
-                        "dte:Direccion": dat_direccion[0]['address_line1'],
-                        "dte:CodigoPostal": dat_direccion[0]['pincode'],  # Codig postal
-                        "dte:Municipio": dat_direccion[0]['county'],  # Municipio
-                        "dte:Departamento": dat_direccion[0]['state'],  # Departamento
-                        "dte:Pais": frappe.db.get_value('Country', {'name': dat_direccion[0]['country']}, 'code').upper()  # CODIG PAIS
-                    }
-                }
-            else:
-                self.__d_emisor = {
+            self.__d_emisor = {
                     "@AfiliacionIVA": frappe.db.get_value('Configuracion Factura Electronica',
                                                         {'name': self.__config_name}, 'afiliacion_iva'),
                     "@CodigoEstablecimiento": dat_direccion[0]['facelec_establishment'],
@@ -282,6 +263,7 @@ class ElectronicCreditNote:
                         "dte:Pais": frappe.db.get_value('Country', {'name': dat_direccion[0]['country']}, 'code').upper()  # CODIG PAIS
                     }
                 }
+            
             return True, 'OK'
 
         except:
@@ -342,6 +324,20 @@ class ElectronicCreditNote:
                         "@CorreoReceptor": datos_default.get('email'),
                         "@IDReceptor": str((self.dat_fac[0]['nit_face_customer']).replace('/', '')).upper().strip(),  # NIT => CF
                         "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
+                        "dte:DireccionReceptor": {
+                            "dte:Direccion": datos_default.get('address'),
+                            "dte:CodigoPostal": datos_default.get('pincode'),
+                            "dte:Municipio": datos_default.get('municipio'),
+                            "dte:Departamento": datos_default.get('departamento'),
+                            "dte:Pais": datos_default.get('pais')
+                        }
+                    }
+                elif frappe.db.get_value('Sales Invoice', {'name': self.__invoice_code}, 'es_dpi') == True:
+                    self.__d_receptor = {
+                        "@CorreoReceptor": datos_default.get('email'),
+                        "@IDReceptor": str((self.dat_fac[0]['nit_face_customer']).replace('/', '')).upper().strip(),  # NIT => CF
+                        "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
+                        "@TipoEspecial": str('CUI'), 
                         "dte:DireccionReceptor": {
                             "dte:Direccion": datos_default.get('address'),
                             "dte:CodigoPostal": datos_default.get('pincode'),
