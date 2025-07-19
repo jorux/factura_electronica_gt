@@ -253,7 +253,7 @@ class ElectronicCreditNote:
                                                         {'name': self.__config_name}, 'afiliacion_iva'),
                     "@CodigoEstablecimiento": dat_direccion[0]['facelec_establishment'],
                     "@CorreoEmisor": dat_direccion[0]['email_id'],
-                    "@NITEmisor": str((dat_compania[0]['nit_face_company']).replace('-', '')).upper().strip(),
+                    "@IDReceptor": str((dat_compania[0]['nit_face_company']).replace('-', '')).upper().strip(),
                     "@TipoEspecial": str('CUI'),
                     "@NombreComercial": nom_comercial,
                     "@NombreEmisor": nombre_emisor,
