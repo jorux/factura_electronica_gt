@@ -100,7 +100,7 @@ def buscar_nombre (doc, method):
 
                 response_json = json.loads(response.read().decode('utf-8'))
 
-                frappe.log_error("'nit'", "response_json")
+                frappe.log_error("'nit2'", response_json)
                 # Extraer el nombre y asignarlo a doc.nombre_segun_sat
 
 
