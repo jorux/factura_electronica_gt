@@ -50,7 +50,7 @@ def buscar_nombre (doc, method):
             alias = result_alias[0][0] if result_alias else None #Extrae el alias, si no existe devuelve None.
 
 
-            nit = doc.nit_face_customer
+            nit = (doc.nit_face_customer).replace('-', '').upper().strip()
 
 
             
