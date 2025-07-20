@@ -120,7 +120,7 @@ def buscar_nombre (doc, method):
 
 
                     frappe.log_error("La respuesta de la API no contiene el campo 'nombre'", "Error Extracción Nombre") #Log en caso de no existir nombre.
-                    frappe.db.set_value("Sales Invoice",{"name":doc.name},{"nombre_segun_sat":"customer_name"})
+
 
 
 
@@ -135,7 +135,7 @@ def buscar_nombre (doc, method):
 
 
                 frappe.log_error(f"Error al conectar con la API de FEL: {e}", "Buscar NIT")
-                frappe.db.set_value("Sales Invoice",{"name":doc.name},{"nombre_segun_sat":"customer_name"})
+
 
                 return None
 
@@ -235,7 +235,6 @@ def buscar_nombre (doc, method):
 
                     frappe.log_error("La respuesta de la API no contiene el campo 'nombre'", "Error Extracción Nombre") #Log en caso de no existir nombre.
 
-                    frappe.db.set_value("Sales Invoice",{"name":doc.name},{"nombre_segun_sat":"customer_name"})
 
 
 
@@ -251,7 +250,5 @@ def buscar_nombre (doc, method):
 
                 frappe.log_error(f"Error al conectar con la API de FEL: {e}", "Buscar NIT")
 
-                frappe.db.set_value("Sales Invoice",{"name":doc.name},{"nombre_segun_sat":"customer_name"})
-                
 
                 return None
