@@ -100,7 +100,7 @@ def buscar_nombre (doc, method):
 
                 response_json = json.loads(response.read().decode('utf-8'))
 
-
+                frappe.log_error("'nit'", "response_json")
                 # Extraer el nombre y asignarlo a doc.nombre_segun_sat
 
 
@@ -213,7 +213,7 @@ def buscar_nombre (doc, method):
 
 
                 response_json = json.loads(response.read().decode('utf-8'))
-
+                frappe.log_error("'nombre'", "response_json")
 
                 # Extraer el nombre y asignarlo a doc.nombre_segun_sat
 
@@ -253,5 +253,6 @@ def buscar_nombre (doc, method):
 
                 frappe.db.set_value("Sales Invoice",{"name":doc.name},{"nombre_segun_sat":"customer_name"})
                 
+                frappe.log_error("4")
 
                 return None
