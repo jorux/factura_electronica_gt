@@ -96,8 +96,7 @@ app_include_js = ["factura_electronica.bundle.js"]
 doc_events = {
     "Sales Invoice": {
         "on_submit": ["factura_electronica.api.pos_calculations",
-                    "factura_electronica.api.generate_access_number",
-                      "factura_electronica.api.buscar_nombre"],
+                      "factura_electronica.api.generate_access_number"],
         "after_insert": "factura_electronica.api.generate_access_number",
     },
     "Purchase Invoice": {
