@@ -182,7 +182,7 @@ def buscar_nombre (doc, method):
 
             }
 
-
+            frappe.log_error(f"payload dpi", payload)
             payload_json = json.dumps(payload).encode('utf-8')
 
 
