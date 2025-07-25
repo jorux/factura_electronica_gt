@@ -26,7 +26,7 @@ def buscar_nombre (doc, method):
     """
 
 
-    if doc.es_dpi == False and doc.es_pasaporte == False:
+    if doc.es_dpi == False:
 
 
         try:
