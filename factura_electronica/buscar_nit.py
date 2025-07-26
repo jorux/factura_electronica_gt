@@ -215,7 +215,7 @@ def buscar_nombre (doc, method):
 
                 # Extraer el nombre y asignarlo a doc.nombre_segun_sat
 
-
+                frappe.log_error(f"response dpi", response_json)
                 if response_json and 'nombre' in response_json:
 
 
