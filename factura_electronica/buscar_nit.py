@@ -192,7 +192,7 @@ def buscar_nombre (doc, method):
             # Configurar la solicitud POST
 
 
-            url = "https://consultareceptores.feel.com.gt/rest/action"
+            url = "https://certificador.feel.com.gt/api/v2/servicios/externos/cui"
 
 
             headers = {'Content-Type': 'application/json'}
