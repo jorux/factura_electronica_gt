@@ -48,4 +48,4 @@ def buscar_nombre (doc, method):
     else:
         
             
-        frappe.db.set_value("Sales Invoice",{"name":doc.name},{"customer_name":doc.name})
+        frappe.db.set_value("Sales Invoice",{"name":doc.name},{"customer_name":doc.customer_name})
