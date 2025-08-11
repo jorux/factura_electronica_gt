@@ -183,7 +183,7 @@ class ElectronicInvoice:
             # De la factura obtenemos la compañia y direccion compañia emisora
             self.dat_fac = frappe.db.get_values('Sales Invoice', filters={'name': self.__invoice_code},
                                                 fieldname=['company', 'company_address', 'nit_face_customer',
-                                                           'customer_address', 'customer_name','nombre_segun_sat', 'total_taxes_and_charges',
+                                                           'customer_address', 'customer_name','customer','nombre_segun_sat', 'total_taxes_and_charges',
                                                            'grand_total'], as_dict=1)
             if len(self.dat_fac) == 0:
                 return False, f'''No se encontro ninguna factura con serie: {self.__invoice_code}.\
@@ -328,7 +328,7 @@ class ElectronicInvoice:
                     self.__d_receptor = {
                         "@CorreoReceptor": datos_default.get('email'),
                         "@IDReceptor": str((self.dat_fac[0]['nit_face_customer']).replace('/', '').replace('-', '')).upper().strip(),  # NIT => CF
-                        "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
+                        "@NombreReceptor": str(self.dat_fac[0]["customer"]),
                         "@TipoEspecial": str('EXT'), 
                         "dte:DireccionReceptor": {
                             "dte:Direccion": datos_default.get('address'),
@@ -387,7 +387,7 @@ class ElectronicInvoice:
                     self.__d_receptor = {
                         "@CorreoReceptor": dat_direccion[0].get('email_id', datos_default.get('email')),
                         "@IDReceptor": str(self.dat_fac[0]['nit_face_customer']),  # NIT
-                        "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
+                        "@NombreReceptor": str(self.dat_fac[0]["customer"]),
                         "@TipoEspecial": str('EXT'), 
                         "dte:DireccionReceptor": {
                             "dte:Direccion": dat_direccion[0].get('address_line1', datos_default.get('address')),
