@@ -314,7 +314,7 @@ class ElectronicInvoice:
                     self.__d_receptor = {
                         "@CorreoReceptor": datos_default.get('email'),
                         "@IDReceptor": str((self.dat_fac[0]['nit_face_customer']).replace('/', '').replace('-', '')).upper().strip(),  # NIT => CF
-                        "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
+                        "@NombreReceptor": str(self.dat_fac[0]["customer"]),
                         "@TipoEspecial": str('CUI'),
                         "dte:DireccionReceptor": {
                             "dte:Direccion": datos_default.get('address'),
@@ -373,7 +373,7 @@ class ElectronicInvoice:
                     self.__d_receptor = {
                         "@CorreoReceptor": dat_direccion[0].get('email_id', datos_default.get('email')),
                         "@IDReceptor": str((self.dat_fac[0]['nit_face_customer']).replace('/', '').replace('-', '')).upper().strip(),  # NIT
-                        "@NombreReceptor": str(self.dat_fac[0]["customer_name"]),
+                        "@NombreReceptor": str(self.dat_fac[0]["customer"]),
                         "@TipoEspecial": str('CUI'), 
                         "dte:DireccionReceptor": {
                             "dte:Direccion": dat_direccion[0].get('address_line1', datos_default.get('address')),
