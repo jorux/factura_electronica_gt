@@ -273,28 +273,22 @@ class ElectronicAbonoNote:
                                         "@Tipo": "NABN"
                                     },
                                     "dte:Emisor": {
-                                        "@AfiliacionIVA": self.__d_emisor.get('@AfiliacionIVA', 'GEN'),
-                                        "@CodigoEstablecimiento": self.__d_emisor.get('@CodigoEstablecimiento', '1'),
-                                        "@NITEmisor": self.__d_emisor.get('@NITEmisor', '9000000000K'),
-                                        "@NombreComercial": self.__d_emisor.get('@NombreComercial', 'INFILE, SOCIEDAD ANONIMA'),
-                                        "@NombreEmisor": self.__d_emisor.get('@NombreEmisor', 'INFILE, SOCIEDAD ANONIMA'),
-                                        "dte:DireccionEmisor": self.__d_emisor.get('dte:DireccionEmisor', {
-                                            "dte:Direccion": "CUIDAD",
-                                            "dte:CodigoPostal": "01010",
-                                            "dte:Municipio": "GUATEMALA",
-                                            "dte:Departamento": "GUATEMALA",
-                                            "dte:Pais": "GT"
-                                        })
+                                        "@AfiliacionIVA": self.__d_emisor.get("@AfiliacionIVA"),
+                                        "@CodigoEstablecimiento": self.__d_emisor.get("@CodigoEstablecimiento"),
+                                        "@NITEmisor": self.__d_emisor.get("@NITEmisor"),
+                                        "@NombreComercial": self.__d_emisor.get("@NombreComercial"),
+                                        "@NombreEmisor": self.__d_emisor.get("@NombreEmisor"),
+                                        "dte:DireccionEmisor": self.__d_emisor.get("dte:DireccionEmisor")
                                     },
                                     "dte:Receptor": {
-                                        "@IDReceptor": self.dat_fac[0].get('nit_face_customer', 'CF') if hasattr(self, 'dat_fac') else 'CF',
-                                        "@NombreReceptor": self.dat_fac[0].get('customer_name', 'CONSUMIDOR FINAL') if hasattr(self, 'dat_fac') else 'CONSUMIDOR FINAL',
+                                        "@IDReceptor": self.dat_fac[0].get('nit_face_customer') if hasattr(self, 'dat_fac') and self.dat_fac else None,
+                                        "@NombreReceptor": self.dat_fac[0].get('customer_name') if hasattr(self, 'dat_fac') and self.dat_fac else None,
                                         "dte:DireccionReceptor": {
-                                            "dte:Direccion": self.receptor_data[0].get('address_line1', 'CUIDAD') if hasattr(self, 'receptor_data') and self.receptor_data else 'CUIDAD',
-                                            "dte:CodigoPostal": self.receptor_data[0].get('pincode', '01010') if hasattr(self, 'receptor_data') and self.receptor_data else '01010',
-                                            "dte:Municipio": self.receptor_data[0].get('city', 'GUATEMALA') if hasattr(self, 'receptor_data') and self.receptor_data else 'GUATEMALA',
-                                            "dte:Departamento": self.receptor_data[0].get('state', 'GUATEMALA') if hasattr(self, 'receptor_data') and self.receptor_data else 'GUATEMALA',
-                                            "dte:Pais": frappe.db.get_value('Country', {'name': self.receptor_data[0].get('country')}, 'code').upper() if hasattr(self, 'receptor_data') and self.receptor_data and self.receptor_data[0].get('country') else 'GT'
+                                            "dte:Direccion": self.receptor_data[0].get('address_line1') if hasattr(self, 'receptor_data') and self.receptor_data else None,
+                                            "dte:CodigoPostal": self.receptor_data[0].get('pincode') if hasattr(self, 'receptor_data') and self.receptor_data else None,
+                                            "dte:Municipio": self.receptor_data[0].get('city') if hasattr(self, 'receptor_data') and self.receptor_data else None,
+                                            "dte:Departamento": self.receptor_data[0].get('state') if hasattr(self, 'receptor_data') and self.receptor_data else None,
+                                            "dte:Pais": frappe.db.get_value('Country', {'name': self.receptor_data[0].get('country')}, 'code').upper() if hasattr(self, 'receptor_data') and self.receptor_data and self.receptor_data[0].get('country') else None
                                         }
                                     },
                                     "dte:Items": self.__d_items,
