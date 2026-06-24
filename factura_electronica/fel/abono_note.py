@@ -145,15 +145,34 @@ class ElectronicAbonoNote:
                                                  fieldname=['address_line1', 'email_id', 'pincode',
                                                             'state', 'city', 'country'], as_dict=1)
 
+            if len(self.receptor_data) == 0:
+                direccion = "CIUDAD"
+                codigo_postal = "01001"
+                municipio = "GUATEMALA"
+                departamento = "GUATEMALA"
+                pais = "GT"
+            else:
+                rec_data = self.receptor_data[0]
+                direccion = rec_data.get('address_line1') or "CIUDAD"
+                codigo_postal = rec_data.get('pincode') or "01001"
+                municipio = rec_data.get('city') or "GUATEMALA"
+                departamento = rec_data.get('state') or "GUATEMALA"
+                pais_code = frappe.db.get_value('Country', {'name': rec_data.get('country')}, 'code') if rec_data.get('country') else "GT"
+                pais = pais_code.upper() if pais_code else "GT"
+
+            nit_receptor = str(self.dat_fac[0].get('nit_face_customer', 'CF')).replace('/', '').replace('-', '').upper().strip()
+            if not nit_receptor:
+                nit_receptor = "CF"
+
             self.__d_receptor = {
-                "@IDReceptor": self.dat_fac[0]['nit_face_customer'],
+                "@IDReceptor": nit_receptor,
                 "@NombreReceptor": self.dat_fac[0]['customer_name'],
                 "dte:DireccionReceptor": {
-                    "dte:Direccion": self.receptor_data[0]['address_line1'],
-                    "dte:CodigoPostal": self.receptor_data[0]['pincode'],
-                    "dte:Municipio": self.receptor_data[0]['city'],
-                    "dte:Departamento": self.receptor_data[0]['state'],
-                    "dte:Pais": frappe.db.get_value('Country', {'name': self.receptor_data[0]['country']}, 'code').upper()
+                    "dte:Direccion": direccion,
+                    "dte:CodigoPostal": codigo_postal,
+                    "dte:Municipio": municipio,
+                    "dte:Departamento": departamento,
+                    "dte:Pais": pais
                 }
             }
 
