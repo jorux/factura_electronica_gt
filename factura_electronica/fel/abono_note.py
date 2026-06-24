@@ -139,31 +139,27 @@ class ElectronicAbonoNote:
 
         # Intentara obtener data de direccion cliente
         try:
-            dat_direccion = frappe.db.get_values('Address', filters={'name': self.dat_fac[0]['customer_address']},
-                                                 fieldname=['address_line1', 'email_id', 'pincode',
-                                                            'state', 'city', 'country'], as_dict=1)    
-        # Datos del receptor
+            # Datos del receptor
             self.receptor_data = frappe.db.get_values('Address', filters={'name': self.dat_fac[0]['customer_address']},
                                                  fieldname=['address_line1', 'email_id', 'pincode',
                                                             'state', 'city', 'country'], as_dict=1)
-            # NOTE: se quitara esta validacion para permitir usar valores default en caso no exista una direccion
-            # o campos especificacion de direccion
-            # if len(dat_direccion) == 0:
-            #     return False, f'''No se encontro ninguna direccion para el cliente {self.dat_fac[0]["customer_name"]}.\
-            #                       Por favor asigna un direccion y vuelve a intentarlo'''
 
-            # # Validacion data direccion cliente
-            # for dire in dat_direccion[0]:
-            #     if dat_direccion[0][dire] is None or dat_direccion[0][dire] is '':
-            #         return False, '''No se puede completar la operacion ya que el campo {} de la direccion del cliente {} no\
-            #                          tiene data, por favor asignarle un valor e intentar de nuevo \
-            #                       '''.format(str(dire), self.dat_fac[0]["customer_name"])
+            self.__d_receptor = {
+                "@IDReceptor": self.dat_fac[0]['nit_face_customer'],
+                "@NombreReceptor": self.dat_fac[0]['customer_name'],
+                "dte:DireccionReceptor": {
+                    "dte:Direccion": self.receptor_data[0]['address_line1'],
+                    "dte:CodigoPostal": self.receptor_data[0]['pincode'],
+                    "dte:Municipio": self.receptor_data[0]['city'],
+                    "dte:Departamento": self.receptor_data[0]['state'],
+                    "dte:Pais": frappe.db.get_value('Country', {'name': self.receptor_data[0]['country']}, 'code').upper()
+                }
+            }
 
-        # Items de la nota
             return True, 'OK'
 
         except:
-            return False, 'No se pudo obtener data de los items en la factura {}, Error: {}'.format(self.__inv_credit_note, str(frappe.get_traceback()))
+            return False, 'No se pudo obtener data de los items en la factura {}, Error: {}'.format(self.__actual_inv_name, str(frappe.get_traceback()))
 
     def items(self):
         """
@@ -223,7 +219,7 @@ class ElectronicAbonoNote:
 
                     obj_item["@NumeroLinea"] = str(contador)
                     obj_item["dte:Cantidad"] = "{:.2f}".format(abs(float(self.__dat_items[i]['qty'])))
-                    obj_item["dte:UnidadMedida"] = self.__dat_items[i].get('facelec_three_digit_uom_code') or 'UNI'
+                    obj_item["dte:UnidadMedida"] = self.__dat_items[i]['facelec_three_digit_uom_code']
                     obj_item["dte:Descripcion"] = remove_html_tags(description_to_item)
                     obj_item["dte:PrecioUnitario"] = "{:.2f}".format(flt(abs(precio_uni), self.__precision))
                     obj_item["dte:Precio"] = "{:.2f}".format(flt(abs(precio_item), self.__precision))
@@ -267,30 +263,9 @@ class ElectronicAbonoNote:
                                 "@ID": "DatosCertificados",
                                 "dte:DatosEmision": {
                                     "@ID": "DatosEmision",
-                                    "dte:DatosGenerales": {
-                                        "@CodigoMoneda": self.__d_emisor.get('@CodigoMoneda', 'GTQ'),
-                                        "@FechaHoraEmision": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-06:00"),
-                                        "@Tipo": "NABN"
-                                    },
-                                    "dte:Emisor": {
-                                        "@AfiliacionIVA": self.__d_emisor.get("@AfiliacionIVA"),
-                                        "@CodigoEstablecimiento": self.__d_emisor.get("@CodigoEstablecimiento"),
-                                        "@NITEmisor": self.__d_emisor.get("@NITEmisor"),
-                                        "@NombreComercial": self.__d_emisor.get("@NombreComercial"),
-                                        "@NombreEmisor": self.__d_emisor.get("@NombreEmisor"),
-                                        "dte:DireccionEmisor": self.__d_emisor.get("dte:DireccionEmisor")
-                                    },
-                                    "dte:Receptor": {
-                                        "@IDReceptor": self.dat_fac[0].get('nit_face_customer') if hasattr(self, 'dat_fac') and self.dat_fac else None,
-                                        "@NombreReceptor": self.dat_fac[0].get('customer_name') if hasattr(self, 'dat_fac') and self.dat_fac else None,
-                                        "dte:DireccionReceptor": {
-                                            "dte:Direccion": self.receptor_data[0].get('address_line1') if hasattr(self, 'receptor_data') and self.receptor_data else None,
-                                            "dte:CodigoPostal": self.receptor_data[0].get('pincode') if hasattr(self, 'receptor_data') and self.receptor_data else None,
-                                            "dte:Municipio": self.receptor_data[0].get('city') if hasattr(self, 'receptor_data') and self.receptor_data else None,
-                                            "dte:Departamento": self.receptor_data[0].get('state') if hasattr(self, 'receptor_data') and self.receptor_data else None,
-                                            "dte:Pais": frappe.db.get_value('Country', {'name': self.receptor_data[0].get('country')}, 'code').upper() if hasattr(self, 'receptor_data') and self.receptor_data and self.receptor_data[0].get('country') else None
-                                        }
-                                    },
+                                    "dte:DatosGenerales": self.__d_general,
+                                    "dte:Emisor": self.__d_emisor,
+                                    "dte:Receptor": self.__d_receptor,
                                     "dte:Items": self.__d_items,
                                     "dte:Totales": {
                                         "dte:GranTotal": "{:.2f}".format(self.__gran_total)
@@ -320,8 +295,34 @@ class ElectronicAbonoNote:
         Returns:
             tuple: True/False, mensaje de validación
         """
-        # Aquí puedes agregar tus validaciones personalizadas
+        status_data_gen = self.general_data()
+        if status_data_gen[0] == False:
+            return status_data_gen
+
+        status_sender = self.sender()
+        if status_sender[0] == False:
+            return status_sender
+
+        status_receiver = self.receiver()
+        if status_receiver[0] == False:
+            return status_receiver
+
+        status_items = self.items()
+        if status_items[0] == False:
+            return status_items
+
         return True, "Validación exitosa"
+
+    def general_data(self):
+        try:
+            self.__d_general = {
+                "@CodigoMoneda": "GTQ",
+                "@FechaHoraEmision": datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S-06:00"),
+                "@Tipo": "NABN"
+            }
+            return True, 'OK'
+        except:
+            return False, 'Error al obtener general_data'
 
     def sign_invoice(self):
         """
