@@ -32,7 +32,9 @@ class ElectronicAbonoNote:
             items (list): Lista de items
         """
         self.__actual_inv_name = actual_inv_name
+        self.__inv_credit_note = actual_inv_name
         self.__invoice_code = invoice_code  # HACE REFERENCIA A LA FACT FEL
+        self.__config_name = invoice_code # IN FEL API THIS ARG IS THE CONFIG NAME
         self.__naming_serie = naming_series
         self.__log_error = []
         self.__precision = get_currency_precision()
@@ -112,7 +114,6 @@ class ElectronicAbonoNote:
             self.__d_emisor = {
                 "@AfiliacionIVA": "GEN",
                 "@CodigoEstablecimiento": dat_direccion[0]['facelec_establishment'],
-                "@CorreoEmisor": dat_direccion[0]['email_id'],
                 "@NITEmisor": str((dat_compania[0]['nit_face_company']).replace('-', '')).upper().strip(),
                 "@NombreComercial": nom_comercial,
                 "@NombreEmisor": nombre_emisor,
