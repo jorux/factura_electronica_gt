@@ -576,11 +576,6 @@ def pos_calculations(doc, event):
                 else:
                     facelec_is_discount = 0
 
-                # calculos para combustible
-                if (item.factelecis_fuel):
-                    facelec_gt_tax_net_fuel_amt = (facelec_amount_minus_excise_tax) / (1 + (rate_iva / 100))
-                    facelec_sales_tax_for_this_row = (facelec_gt_tax_net_fuel_amt) * (rate_iva / 100)
-                    total_iva_fact += facelec_sales_tax_for_this_row
 
                 # calculos para bienes
                 if (item.facelec_is_good):
