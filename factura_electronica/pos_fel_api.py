@@ -6,8 +6,8 @@ from __future__ import unicode_literals
 import frappe
 from frappe import _
 
-from factura_electronica.fel.canceller import CancelDocument
-from factura_electronica.fel.fel import ElectronicInvoice
+from factura_electronica.fel.pos_canceller import CancelDocument
+from factura_electronica.fel.pos_fel import ElectronicInvoice
 
 # CANCELADOR DE DOCUMENTOS ELECTRONICOS FEL
 @frappe.whitelist()
