@@ -323,10 +323,8 @@ frappe.ui.form.on("POS Invoice", {
   setup(frm) {
     if (frm.doc.docstatus == 0) {
       frappe.call("factura_electronica.utils.utilities_facelec.get_rounding_config").then(({ message }) => {
-        if (frm.fields_dict.disable_rounded_total) {
-          frm.set_value("disable_rounded_total", message);
-          frm.refresh_field("disable_rounded_total");
-        }
+        frm.set_value("disable_rounded_total", message);
+        frm.refresh_field("disable_rounded_total");
       });
     }
   },
