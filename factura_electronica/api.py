@@ -539,7 +539,7 @@ def pos_calculations(doc, event):
     """
     try:
         validar_config = validar_configuracion()
-        sales_invoice = frappe.get_doc(doc.doctype, {'name': doc.name})
+        sales_invoice = frappe.get_doc('Sales Invoice', {'name': doc.name})
 
         # Si es una factura generada desde POS y exista una configuracion facelc
         if sales_invoice.is_pos:
@@ -594,7 +594,7 @@ def pos_calculations(doc, event):
                     facelec_sales_tax_for_this_row = (facelec_gt_tax_net_services_amt) * (rate_iva / 100)
                     total_iva_fact += facelec_sales_tax_for_this_row
 
-                frappe.db.set_value(doc.doctype + ' Item', {'parent': doc.name, 'item_code': item.item_code, 'qty': item.qty, 'rate': item.rate}, {
+                frappe.db.set_value('Sales Invoice Item', {'parent': doc.name, 'item_code': item.item_code, 'qty': item.qty, 'rate': item.rate}, {
                     'facelec_other_tax_amount': facelec_other_tax_amount,
                     'facelec_amount_minus_excise_tax': facelec_amount_minus_excise_tax,
                     'facelec_gt_tax_net_fuel_amt': facelec_gt_tax_net_fuel_amt,

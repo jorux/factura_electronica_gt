@@ -37,7 +37,7 @@ app_include_js = ["factura_electronica.bundle.js"]
 # web_include_js = "/assets/factura_electronica/js/factura_electronica.js"
 
 # include js in page
-page_js = {"point-of-sale" : "public/js/pos_extension.js"}
+# page_js = {"page" : "public/js/file.js"}
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
@@ -95,12 +95,6 @@ page_js = {"point-of-sale" : "public/js/pos_extension.js"}
 
 doc_events = {
     "Sales Invoice": {
-        "on_submit": ["factura_electronica.api.pos_calculations",
-                      "factura_electronica.api.generate_access_number",
-                      "factura_electronica.buscar_nit.buscar_nombre"],
-        "after_insert": "factura_electronica.api.generate_access_number",
-    },
-    "POS Invoice": {
         "on_submit": ["factura_electronica.api.pos_calculations",
                       "factura_electronica.api.generate_access_number",
                       "factura_electronica.buscar_nit.buscar_nombre"],
