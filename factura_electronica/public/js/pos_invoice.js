@@ -129,16 +129,16 @@ function btn_generator(frm) {
     },
   });
 }
-// FIN BOTONES GENERADORES DOCS ELECTRONICOS
+  // FIN BOTONES GENERADORES DOCS ELECTRONICOS
 
-// INICIO GENERACION POLIZA CON RETENCIONES
-// TODO:AGREGAR VALIDACION EXISTENCIA DE JOURNA ENTRY
-// VALIDAR Y CREAR DOCUMENTACION DE RETENCIONES
-// if (frm.doc.docstatus === 1 && frm.doc.status !== "Paid") {
-//   btn_journal_entry_retention(frm);
-// }
-// FIN GENERACION POLIZA CON RETENCIONES
-
+  // INICIO GENERACION POLIZA CON RETENCIONES
+  // TODO:AGREGAR VALIDACION EXISTENCIA DE JOURNA ENTRY
+  // VALIDAR Y CREAR DOCUMENTACION DE RETENCIONES
+  // if (frm.doc.docstatus === 1 && frm.doc.status !== "Paid") {
+  //   btn_journal_entry_retention(frm);
+  // }
+  // FIN GENERACION POLIZA CON RETENCIONES
+}
 
 /**
  * @summary Para impuestos especiales (OJO SOLO COMBUSTIBLES) crear entradas en GL Entry para cuadrar montos
@@ -347,9 +347,9 @@ frappe.ui.form.on("POS Invoice", {
     dependency_validator(frm);
     generar_tabla_html(frm);
   },
-  discount_amount: function (frm, cdt, cdn) { },
+  discount_amount: function (frm, cdt, cdn) {},
   // Se ejecuta antes de guardar el documento
-  before_save: function (frm, cdt, cdn) { },
+  before_save: function (frm, cdt, cdn) {},
   // Se ejecuta al validar el documento
   on_submit: function (frm, cdt, cdn) {
     // Ocurre cuando se presione el boton validar.
